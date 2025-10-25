@@ -19,12 +19,12 @@ export default function TrendChart({ sector, district }: TrendChartProps) {
       try {
         const result = await fetchPredictData(sector, district)
         
-        // Transform data for chart
+        // Transform data for chart with proper confidence intervals per point
         const chartData = result.trends.map((item: any) => ({
           year: item.year.toString(),
           value: item.value,
-          lower: result.confidence[0],
-          upper: result.confidence[1]
+          lower: item.confidence_low || item.value - 5,
+          upper: item.confidence_high || item.value + 5
         }))
         
         setData(chartData)

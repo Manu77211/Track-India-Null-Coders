@@ -64,14 +64,14 @@ export default function Dashboard() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filters Section */}
+          {/* Filters Section - Fixed on Left */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:col-span-1"
           >
-            <div className={`${theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-100'} backdrop-blur-sm p-6 rounded-2xl shadow-lg border sticky top-24`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-100'} backdrop-blur-sm p-6 rounded-2xl shadow-lg border fixed left-4 top-52 w-[calc((100%-3rem-2rem)/4)] max-h-[calc(100vh-14rem)] overflow-y-auto hidden lg:block`}>
               <div className="flex items-center gap-2 mb-6">
                 <Filter className={theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} size={20} />
                 <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Filters</h2>

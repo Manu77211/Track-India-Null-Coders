@@ -11,10 +11,12 @@ interface DriverChartProps {
 export default function DriverChart({ sector }: DriverChartProps) {
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
+      setError(false)
       try {
         const result = await fetchDriversData(sector)
         
@@ -27,6 +29,7 @@ export default function DriverChart({ sector }: DriverChartProps) {
         setData(chartData)
       } catch (error) {
         console.error('Failed to load drivers data:', error)
+        setError(true)
       } finally {
         setLoading(false)
       }
@@ -39,6 +42,14 @@ export default function DriverChart({ sector }: DriverChartProps) {
     return (
       <div className="h-64 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
+    )
+  }
+
+  if (error || data.length === 0) {
+    return (
+      <div className="h-64 flex items-center justify-center text-gray-500">
+        <p>No driver data available</p>
       </div>
     )
   }

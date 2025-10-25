@@ -24,7 +24,9 @@ export const fetchPredictData = async (sector: string, district: string) => {
       return {
         trends: data.data.map((item: any) => ({
           year: item.year,
-          value: item.value
+          value: item.value,
+          confidence_low: item.confidence_low,
+          confidence_high: item.confidence_high
         })),
         confidence: data.data.length > 0 
           ? [data.data[0].confidence_low, data.data[data.data.length - 1].confidence_high]
@@ -35,9 +37,9 @@ export const fetchPredictData = async (sector: string, district: string) => {
     // Fallback to mock data if API fails
     return {
       trends: [
-        { year: 2023, value: 75 },
-        { year: 2024, value: 78 },
-        { year: 2025, value: 82 },
+        { year: 2023, value: 75, confidence_low: 70, confidence_high: 80 },
+        { year: 2024, value: 78, confidence_low: 73, confidence_high: 83 },
+        { year: 2025, value: 82, confidence_low: 77, confidence_high: 87 },
       ],
       confidence: [70, 85],
     }
@@ -46,9 +48,9 @@ export const fetchPredictData = async (sector: string, district: string) => {
     // Return mock data as fallback
     return {
       trends: [
-        { year: 2023, value: 75 },
-        { year: 2024, value: 78 },
-        { year: 2025, value: 82 },
+        { year: 2023, value: 75, confidence_low: 70, confidence_high: 80 },
+        { year: 2024, value: 78, confidence_low: 73, confidence_high: 83 },
+        { year: 2025, value: 82, confidence_low: 77, confidence_high: 87 },
       ],
       confidence: [70, 85],
     }
