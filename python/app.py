@@ -69,6 +69,9 @@ def before_first_request():
 # Health check endpoint
 @app.route('/')
 def home():
+    db_status = "connected" if db is not None else "disconnected"
+    collections = list(db.list_collection_names()) if db is not None else []
+    
     return jsonify({
         'status': 'online',
         'service': 'Track India API',
