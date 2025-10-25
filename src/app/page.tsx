@@ -176,7 +176,7 @@ export default function Home() {
           </div>
           <div className="md:col-span-7 grid grid-cols-2 gap-6">
             <div ref={el => { workCards.current[0] = el }}>
-              <Link href="/dashboard" className="block aspect-[4/5] rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 shadow-xl overflow-hidden relative group cursor-pointer">
+              <Link href="/dashboard" prefetch={true} className="block aspect-[4/5] rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 shadow-xl overflow-hidden relative group cursor-pointer">
                 <div className="w-full h-full bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
                   <svg className="w-24 h-24 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -193,7 +193,7 @@ export default function Home() {
               </Link>
             </div>
             <div ref={el => { workCards.current[1] = el }}>
-              <Link href="/chat" className="block aspect-[4/5] rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 shadow-xl overflow-hidden relative group cursor-pointer">
+              <Link href="/chat" prefetch={true} className="block aspect-[4/5] rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 shadow-xl overflow-hidden relative group cursor-pointer">
                 <div className="w-full h-full bg-gradient-to-br from-green-600/20 to-blue-600/20 flex items-center justify-center">
                   <svg className="w-24 h-24 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -300,8 +300,8 @@ export default function Home() {
               </div>
               
               <div className="space-y-4">
-                <Link href="/dashboard" className="flex items-center gap-4 text-lg group">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Link href="/dashboard" prefetch={true} className="flex items-center gap-4 text-lg group">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
@@ -309,8 +309,8 @@ export default function Home() {
                   <span className={`${theme === 'dark' ? 'text-gray-300 group-hover:text-white' : 'text-gray-700 group-hover:text-gray-900'} transition-colors`}>View Dashboard</span>
                 </Link>
                 
-                <Link href="/chat" className="flex items-center gap-4 text-lg group">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Link href="/chat" prefetch={true} className="flex items-center gap-4 text-lg group">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-100 dark:to-gray-300 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>

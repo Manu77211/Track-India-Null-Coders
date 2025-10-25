@@ -18,23 +18,11 @@ interface Conversation {
   timestamp: Date
 }
 
-const mockResponses = [
-  {
-    content: "Based on the data from Karnataka's education sector, the literacy rate in Mysuru district is currently at 87.5% and is projected to reach 92% by 2027. The key drivers are:\n\n1. **Increased funding** for primary education\n2. **Infrastructure development** in rural areas\n3. **Teacher training programs**\n\nWould you like me to show you a detailed forecast?",
-  },
-  {
-    content: "The health infrastructure in Maharashtra shows significant improvement. Here are the key metrics:\n\n| District | Hospitals | Doctors | Improvement |\n|----------|-----------|---------|-------------|\n| Mumbai | 245 | 12,500 | +15% |\n| Pune | 178 | 8,200 | +12% |\n| Nagpur | 142 | 6,800 | +18% |\n\nThe data suggests a positive trend in healthcare accessibility.",
-  },
-  {
-    content: "I can help you analyze district-level data across education, health, and water sectors. Try asking:\n\n- What is the literacy rate in [district]?\n- Show me health infrastructure data for [state]\n- Compare water availability between districts\n- Forecast education trends for next 5 years",
-  },
-]
-
 const examplePrompts = [
-  "What is the literacy rate in Bangalore?",
-  "Show health data for Maharashtra",
-  "Compare water availability across states",
-  "Forecast education trends for 2025-2030"
+  "What are the latest infrastructure projects in India?",
+  "Tell me about Smart Cities Mission updates",
+  "What government initiatives are focused on water management?",
+  "Show me recent developments in renewable energy sector"
 ]
 
 export default function ChatInterface() {
@@ -72,7 +60,7 @@ export default function ChatInterface() {
     }
   }, [input])
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return
 
     const userMessage: Message = {
@@ -97,13 +85,35 @@ export default function ChatInterface() {
     setInput('')
     setIsTyping(true)
 
-    // Simulate AI response
-    setTimeout(() => {
-      const randomResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)]
+    try {
+      // Call RAG + Gemini API
+      const response = await fetch('http://localhost:8010/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: input }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI')
+      }
+
+      const data = await response.json()
+      
+      // Format response with sources if available
+      let content = data.response
+      if (data.sources && data.sources.length > 0) {
+        content += '\n\n**Sources:**\n'
+        data.sources.forEach((source: any, index: number) => {
+          content += `${index + 1}. ${source.title || source.description || 'Government Data'}\n`
+        })
+      }
+
       const aiMessage: Message = {
         id: messages.length + 1,
         role: 'assistant',
-        content: randomResponse.content,
+        content: content,
       }
       
       setConversations(prev => prev.map(conv => {
@@ -115,8 +125,27 @@ export default function ChatInterface() {
         }
         return conv
       }))
+    } catch (error) {
+      console.error('Error calling AI:', error)
+      // Fallback to mock response if API fails
+      const aiMessage: Message = {
+        id: messages.length + 1,
+        role: 'assistant',
+        content: "I'm sorry, I'm having trouble connecting to the data sources right now. Please make sure the Flask backend is running on port 8010.",
+      }
+      
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === currentConversationId) {
+          return {
+            ...conv,
+            messages: [...conv.messages, aiMessage]
+          }
+        }
+        return conv
+      }))
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -249,7 +278,7 @@ export default function ChatInterface() {
                     How can I help you today?
                   </h2>
                   <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Ask me about education, health, and water sectors across Indian districts
+                    Ask me about government infrastructure, Smart Cities, and development projects across India
                   </p>
                 </div>
 

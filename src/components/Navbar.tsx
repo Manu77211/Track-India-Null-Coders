@@ -15,6 +15,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
+    { href: '/updates', label: 'Live Updates' },
     { href: '/chat', label: 'Chat with India' },
     { href: '/about', label: 'About' },
   ]
@@ -24,7 +25,7 @@ export default function Navbar() {
       <div className="max-w-[1400px] mx-auto px-8 md:px-16">
         <div className="flex justify-between items-center py-6">
           {/* Professional Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" prefetch={true} className="flex items-center gap-3 group">
             <div className="relative">
               {/* Logo Icon */}
               <svg 
@@ -76,6 +77,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  prefetch={true}
                   className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                     isActive(link.href)
                       ? theme === 'dark'
@@ -138,6 +140,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={true}
                 onClick={() => setIsOpen(false)}
                 className={`block py-3 px-4 rounded-lg transition-colors ${
                   isActive(link.href)

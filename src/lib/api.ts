@@ -116,3 +116,90 @@ export const fetchDistricts = async (state: string) => {
     return []
   }
 }
+
+// Fetch government updates (infrastructure, funding, policy, announcements)
+export const fetchGovernmentUpdates = async (type: string = 'all', limit: number = 20) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/updates?type=${encodeURIComponent(type)}&limit=${limit}`)
+    const data = await response.json()
+    
+    if (data.success) {
+      return {
+        success: true,
+        updates: data.data,
+        lastUpdated: data.last_updated,
+        nextUpdateIn: data.next_update_in
+      }
+    }
+    
+    return {
+      success: false,
+      updates: [],
+      error: 'Failed to fetch updates'
+    }
+  } catch (error) {
+    console.error('Failed to fetch government updates:', error)
+    return {
+      success: false,
+      updates: [],
+      error: 'Backend not available'
+    }
+  }
+}
+
+// Fetch a specific update by ID
+export const fetchUpdateById = async (id: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/updates/${id}`)
+    const data = await response.json()
+    
+    if (data.success) {
+      return {
+        success: true,
+        update: data.data,
+        related: data.related || [],
+        timestamp: data.timestamp
+      }
+    }
+    
+    return {
+      success: false,
+      update: null,
+      error: data.error || 'Update not found'
+    }
+  } catch (error) {
+    console.error('Failed to fetch update by ID:', error)
+    return {
+      success: false,
+      update: null,
+      error: 'Backend not available'
+    }
+  }
+}
+
+// Fetch statistics for updates page
+export const fetchUpdateStats = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/stats`)
+    const data = await response.json()
+    
+    if (data.success) {
+      return {
+        success: true,
+        stats: data.data,
+        timestamp: data.timestamp
+      }
+    }
+    
+    return {
+      success: false,
+      stats: null
+    }
+  } catch (error) {
+    console.error('Failed to fetch stats:', error)
+    return {
+      success: false,
+      stats: null
+    }
+  }
+}
