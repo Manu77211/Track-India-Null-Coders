@@ -1,39 +1,50 @@
 import requests
 import pandas as pd
+import os
 
-# Dictionary of dataset names and their resource IDs
-dataset_resource_ids = {
-    "Printing Details for the Year 2019-20": "2b9561ee-bc24-4458-bf79-ac5b9dfc119d",
-    "senior_citizen_card_report": "a6f7e6e9-3c0b-4d7e-9e2f-9c8f0f0a9e8e",
-    "fire_service_vehicle_details": "a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
-    "post_matric_merit_cum_means_scholarship": "e9e9b2f3-3b9b-4b1e-bb5d-2f6b6f1a5d6d"
+# Ensure the data folder exists
+os.makedirs("data", exist_ok=True)
+
+# Your API key
+API_KEY = "579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b"
+
+# Dictionary of dataset names and resource IDs
+datasets = {
+    # Fill this dictionary with {"name": "resource_id"}
+    # Example:
+     "gst_revenue_collection": "14613c4e-5ab0-4705-b440-e4e49ae345de",
+      "printing_details_2019_20": "2b9561ee-bc24-4458-bf79-ac5b9dfc119d",
 }
 
-def fetch_data(resource_id, file_name):
+def fetch_data(resource_id, file_name, api_key, limit=1000, offset=0):
     """
-    Fetch data from Karnataka Open Data Portal using resource_id
-    and save it as CSV in data/
+    Generic function to fetch dataset from data.gov.in and save as CSV
     """
-    if not resource_id:
-        print(f"⚠️ Skipping {file_name}, resource ID missing")
-        return
+    url = f"https://api.data.gov.in/resource/{resource_id}"
+    params = {
+        "api-key": api_key,
+        "format": "json",
+        "limit": limit,
+        "offset": offset
+    }
 
-    url = f"https://karnataka.data.gov.in/api/3/action/datastore_search?resource_id={resource_id}&limit=1000"
     try:
-        res = requests.get(url)
-        res.raise_for_status()
-        data = res.json()
-        
-        if "result" in data and "records" in data["result"]:
-            records = data["result"]["records"]
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        if "records" in data:
+            records = data["records"]
             df = pd.DataFrame(records)
-            df.to_csv(f"data/{file_name}.csv", index=False)
-            print(f"✅ Saved {file_name}.csv with {len(df)} rows")
+            safe_file_name = file_name.replace(" ", "_")
+            df.to_csv(f"data/{safe_file_name}.csv", index=False)
+            print(f"✅ Saved {safe_file_name}.csv with {len(df)} rows")
         else:
-            print(f"❌ Failed to fetch {file_name}, no records found")
+            print(f"❌ No records found for {file_name}")
+
     except Exception as e:
         print(f"❌ Failed to fetch {file_name}: {e}")
 
 if __name__ == "__main__":
-    for name, resource_id in dataset_resource_ids.items():
-        fetch_data(resource_id, name)
+    for name, resource_id in datasets.items():
+        fetch_data(resource_id, name, API_KEY)
