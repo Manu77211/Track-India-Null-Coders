@@ -57,7 +57,7 @@ export default function Dashboard() {
           transition={{ duration: 0.6 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
+          <h1 className={`text-4xl font-bold mb-2 ${theme === 'dark' ? 'bg-gradient-to-r from-white to-gray-400' : 'bg-gradient-to-r from-gray-900 to-gray-600'} bg-clip-text text-transparent`}>
             India Development Dashboard
           </h1>
           <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Analyze and forecast development trends across Indian districts</p>
@@ -180,21 +180,21 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className={`${theme === 'dark' ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50/80 border-blue-100'} backdrop-blur-sm p-6 rounded-2xl border`}
+              className={`${theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-100/80 border-gray-300'} backdrop-blur-sm p-6 rounded-2xl border`}
             >
               <h3 className={`text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Data Sources</h3>
               <div className={`space-y-2 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 <p>
-                  • <a href="https://data.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-blue-400 hover:underline' : 'text-blue-600 hover:underline'}>Open Government Data (OGD) Platform India</a>
+                  • <a href="https://data.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-white hover:underline' : 'text-gray-900 hover:underline'}>Open Government Data (OGD) Platform India</a>
                 </p>
                 <p>
-                  • <a href="https://www.census2011.co.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-blue-400 hover:underline' : 'text-blue-600 hover:underline'}>Census of India 2011</a>
+                  • <a href="https://www.census2011.co.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-white hover:underline' : 'text-gray-900 hover:underline'}>Census of India 2011</a>
                 </p>
                 <p>
-                  • <a href="https://niti.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-blue-400 hover:underline' : 'text-blue-600 hover:underline'}>NITI Aayog - National Institution for Transforming India</a>
+                  • <a href="https://niti.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-white hover:underline' : 'text-gray-900 hover:underline'}>NITI Aayog - National Institution for Transforming India</a>
                 </p>
                 <p>
-                  • <a href="https://www.mospi.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-blue-400 hover:underline' : 'text-blue-600 hover:underline'}>Ministry of Statistics and Programme Implementation</a>
+                  • <a href="https://www.mospi.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-white hover:underline' : 'text-gray-900 hover:underline'}>Ministry of Statistics and Programme Implementation</a>
                 </p>
                 <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mt-3`}>
                   Note: Currently using mock data for demonstration. Real data integration in progress.

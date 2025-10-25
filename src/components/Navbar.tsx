@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X, Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/contexts/ThemeContext'
+import { UserButton, SignInButton, SignedIn, SignedOut } from '@clerk/nextjs'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -93,6 +94,28 @@ export default function Navbar() {
               ))}
             </div>
             
+            {/* Auth Buttons */}
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-white text-black hover:bg-gray-200'
+                    : 'bg-gray-900 text-white hover:bg-gray-800'
+                }`}>
+                  Sign In
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: "w-10 h-10 rounded-full"
+                  }
+                }}
+              />
+            </SignedIn>
+            
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -109,6 +132,28 @@ export default function Navbar() {
 
           {/* Mobile Menu Button and Theme Toggle */}
           <div className="md:hidden flex items-center gap-2">
+            {/* Mobile Auth */}
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  theme === 'dark'
+                    ? 'bg-white text-black'
+                    : 'bg-gray-900 text-white'
+                }`}>
+                  Sign In
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: "w-8 h-8 rounded-full"
+                  }
+                }}
+              />
+            </SignedIn>
+            
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-lg transition-colors ${

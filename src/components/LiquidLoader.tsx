@@ -8,37 +8,37 @@ const LiquidLoader = () => {
   const [droplets, setDroplets] = useState([false, false, false, false, false, false, false]);
   const { theme } = useTheme();
 
-  // Theme-aware colors
+  // Theme-aware colors - Black and White theme
   const lightColors = [
-    'from-purple-500 to-pink-500',
-    'from-blue-500 to-purple-500', 
-    'from-cyan-400 to-blue-500',
-    'from-green-400 to-cyan-400',
-    'from-yellow-400 to-green-400',
-    'from-orange-400 to-yellow-400',
-    'from-red-500 to-orange-400'
+    'from-gray-900 to-gray-700',
+    'from-gray-800 to-gray-600', 
+    'from-gray-700 to-gray-500',
+    'from-gray-600 to-gray-400',
+    'from-gray-500 to-gray-300',
+    'from-gray-400 to-gray-200',
+    'from-gray-300 to-gray-100'
   ];
 
   const darkColors = [
-    'from-purple-600 to-pink-600',
-    'from-blue-600 to-purple-600', 
-    'from-cyan-500 to-blue-600',
-    'from-green-500 to-cyan-500',
-    'from-yellow-500 to-green-500',
-    'from-orange-500 to-yellow-500',
-    'from-red-600 to-orange-500'
+    'from-white to-gray-200',
+    'from-gray-100 to-gray-300', 
+    'from-gray-200 to-gray-400',
+    'from-gray-300 to-gray-500',
+    'from-gray-400 to-gray-600',
+    'from-gray-500 to-gray-700',
+    'from-gray-600 to-gray-800'
   ];
 
   const colors = theme === 'dark' ? darkColors : lightColors;
 
   const shadowColors = [
-    '#a855f7', // purple
-    '#3b82f6', // blue
-    '#06b6d4', // cyan
-    '#10b981', // green
-    '#eab308', // yellow
-    '#f97316', // orange
-    '#ef4444'  // red
+    '#111827', // gray-900
+    '#1f2937', // gray-800
+    '#374151', // gray-700
+    '#4b5563', // gray-600
+    '#6b7280', // gray-500
+    '#9ca3af', // gray-400
+    '#d1d5db'  // gray-300
   ];
 
   useEffect(() => {
