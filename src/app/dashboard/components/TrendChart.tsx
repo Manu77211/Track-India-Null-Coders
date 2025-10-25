@@ -1,15 +1,51 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart } from 'recharts'
+import { fetchPredictData } from '@/lib/api'
 
-const data = [
-  { year: '2024', value: 75, lower: 70, upper: 80 },
-  { year: '2025', value: 80, lower: 75, upper: 85 },
-  { year: '2026', value: 85, lower: 80, upper: 90 },
-  { year: '2027', value: 88, lower: 83, upper: 93 },
-]
+interface TrendChartProps {
+  sector: string
+  district: string
+}
 
-export default function TrendChart() {
+export default function TrendChart({ sector, district }: TrendChartProps) {
+  const [data, setData] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true)
+      try {
+        const result = await fetchPredictData(sector, district)
+        
+        // Transform data for chart
+        const chartData = result.trends.map((item: any) => ({
+          year: item.year.toString(),
+          value: item.value,
+          lower: result.confidence[0],
+          upper: result.confidence[1]
+        }))
+        
+        setData(chartData)
+      } catch (error) {
+        console.error('Failed to load trend data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [sector, district])
+
+  if (loading) {
+    return (
+      <div className="h-64 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">

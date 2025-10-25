@@ -139,7 +139,7 @@ export default function Dashboard() {
                 <ExportButton targetId="trend-chart" filename={`trends-${district}-${sector}`} />
               </div>
               <div id="trend-chart">
-                <TrendChart />
+                <TrendChart sector={sector} district={district} />
               </div>
             </motion.div>
 
@@ -158,7 +158,7 @@ export default function Dashboard() {
                 <ExportButton targetId="driver-chart" filename={`drivers-${sector}`} />
               </div>
               <div id="driver-chart">
-                <DriverChart />
+                <DriverChart sector={sector} />
               </div>
             </motion.div>
 
