@@ -3,22 +3,23 @@ import requests
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
-# ======================
 # Load environment variables
-# ======================
 load_dotenv()
+
 MONGO_URI = os.getenv("MONGO_URI")
 API_KEY = os.getenv("API_KEY")
 
-# ======================
 # MongoDB connection
-# ======================
 client = MongoClient(MONGO_URI, tlsAllowInvalidCertificates=True)
 db = client["track_karnataka"]
 
 # ======================
 # Dataset Configuration
 # ======================
+# Each dataset defines:
+#   - resource_id (required)
+#   - struct_func (optional)
+#   - dataset_info (optional metadata)
 datasets = {
     "gst_revenue_collection": {
         "resource_id": "14613c4e-5ab0-4705-b440-e4e49ae345de",
@@ -37,6 +38,7 @@ datasets = {
     },
     "printing_details_2019_20": {
         "resource_id": "2b9561ee-bc24-4458-bf79-ac5b9dfc119d"
+        # No struct_func → raw JSON will be stored
     },
     "inflation_rate": {
         "resource_id": "352b3616-9d3d-42e5-80af-7d21a2a53fab"
@@ -61,32 +63,39 @@ datasets = {
             "source": "data.gov.in"
         }
     },
-    "agriculture_land_utilisation": {
+    "agriculture_data": {
         "resource_id": "c8abc82f-b750-4886-a6c7-e97150fdda9e",
         "struct_func": lambda r, _: {
-            "year": r.get("year__1_"),
-            "geographical_area": float(r.get("geographical_area__2_", 0)),
-            "reporting_area": float(r.get("reporting_area_for_land_utilisation_statistics__col_4_7__11_14_15___3_", 0)),
-            "forests": float(r.get("forests__4_", 0)),
-            "non_agri_uses": float(r.get("not_available_for_cultivation_area_under_non_agri_cultural_uses__5_", 0)),
-            "barren_land": float(r.get("not_available_for_cultivation_barren_and_uncultur_able_land__6_", 0)),
-            "not_available_total": float(r.get("not_available_for_cultivation_total__col_5_6___7_", 0)),
-            "other_uncultivated_pastures": float(r.get("other_uncultivated_land_excluding_fallow_land_permanent_pastures___other_grazing_lands__8_", 0)),
-            "misc_tree_crops": float(r.get("other_uncultivated_land_excluding_fallow_land_land_under_misc_tree_crops___groves__not_incl__in_net_area_sown___9_", 0)),
-            "culturable_waste_land": float(r.get("other_uncultivated_land_excluding_fallow_land_culturable_waste_land__10_", 0)),
-            "other_uncultivated_total": float(r.get("other_uncultivated_land_excluding_fallow_land_total__col_8_to_10___11_", 0)),
-            "fallow_other_than_current": float(r.get("fallow_lands_fallow_lands_other_than_current_fallows__12_", 0)),
-            "current_fallows": float(r.get("fallow_lands_current_fallows__13_", 0)),
-            "fallow_total": float(r.get("fallow_lands_total_col_12_13___14_", 0)),
-            "net_area_sown": float(r.get("net_area_sown__15_", 0)),
-            "total_cropped_area": float(r.get("total_cropped_area__16_", 0)),
-            "area_sown_more_than_once": float(r.get("area_sown_more_than_once__col_16_15___17_", 0)),
-            "agricultural_land_total": float(r.get("agricultural_land_culti_vable_land_cultur_able_land_arable_land__col_9_10_14_15___18_", 0)),
-            "cultivated_land": float(r.get("cultivated_land__col_13_15___19_", 0)),
-            "cropping_intensity": float(r.get("cropping_intensity___of_col_16_over_col_15___20_", 0)),
+            "state": r.get("state_name"),
+            "district": r.get("district_name"),
+            "crop": r.get("crop_name"),
+            "season": r.get("season"),
+            "production": float(r.get("production", 0)),
+            "area": float(r.get("area", 0)),
+            "yield": float(r.get("yield", 0)),
+            "year": int(r.get("year", 0)),
             "metadata": {
                 "resource_id": "c8abc82f-b750-4886-a6c7-e97150fdda9e",
-                "title": "All India level Pattern of Land Utilisation From 2000-01 to 2013-14",
+                "source": "data.gov.in"
+            }
+        }
+    },
+    "state_cpi": {
+        "resource_id": "41fb8750-5afa-4395-a895-19d3f5015c27",
+        "struct_func": lambda r, _: {
+            # Basic fields
+            "sector": r.get("sector"),
+            "year": int(r.get("year", 0)),
+            "month": r.get("name"),
+            # Dynamic loop over all state fields
+            **{
+                k: (float(v) if v != "NA" else None)
+                for k, v in r.items()
+                if k not in ["sector", "year", "name"]
+            },
+            "metadata": {
+                "resource_id": "41fb8750-5afa-4395-a895-19d3f5015c27",
+                "title": "State Level Consumer Price Index (Rural/Urban) upto May-2021",
                 "source": "data.gov.in"
             }
         }
@@ -94,7 +103,7 @@ datasets = {
 }
 
 # ======================
-# Generic fetch & store function
+# Generic fetch & store
 # ======================
 def fetch_and_store(resource_config, collection_name, limit=1000, offset=0):
     resource_id = resource_config["resource_id"]
