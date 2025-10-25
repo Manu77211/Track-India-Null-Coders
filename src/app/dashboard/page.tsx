@@ -9,6 +9,7 @@ import DistrictSearch from '@/components/DistrictSearch'
 import { Download, Filter } from 'lucide-react'
 import jsPDF from 'jspdf'
 import { motion } from 'framer-motion'
+import { useTheme } from '@/contexts/ThemeContext'
 
 const stateDistrictData = {
   Karnataka: ['Bangalore', 'Mysuru', 'Mangalore', 'Hubli', 'Belgaum'],
@@ -17,6 +18,7 @@ const stateDistrictData = {
 }
 
 export default function Dashboard() {
+  const { theme } = useTheme()
   const [sector, setSector] = useState('Education')
   const [state, setState] = useState('Karnataka')
   const [district, setDistrict] = useState('Bangalore')
@@ -46,7 +48,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-8">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'} py-8 pt-24 transition-colors duration-300`}>
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div
@@ -58,7 +60,7 @@ export default function Dashboard() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
             India Development Dashboard
           </h1>
-          <p className="text-gray-600">Analyze and forecast development trends across Indian districts</p>
+          <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Analyze and forecast development trends across Indian districts</p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -69,18 +71,18 @@ export default function Dashboard() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:col-span-1"
           >
-            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-24">
+            <div className={`${theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-100'} backdrop-blur-sm p-6 rounded-2xl shadow-lg border sticky top-24`}>
               <div className="flex items-center gap-2 mb-6">
-                <Filter className="text-blue-600" size={20} />
-                <h2 className="text-xl font-semibold text-gray-900">Filters</h2>
+                <Filter className={theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} size={20} />
+                <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Filters</h2>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Sector</label>
+                  <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Sector</label>
                   <select 
                     value={sector}
                     onChange={(e) => setSector(e.target.value)}
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className={`w-full p-3 border ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
                   >
                     <option>Education</option>
                     <option>Health</option>
@@ -88,11 +90,11 @@ export default function Dashboard() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">State</label>
+                  <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>State</label>
                   <select 
                     value={state}
                     onChange={(e) => handleStateChange(e.target.value)}
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className={`w-full p-3 border ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
                   >
                     <option>Karnataka</option>
                     <option>Maharashtra</option>
@@ -129,12 +131,12 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+              className={`${theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-100'} backdrop-blur-sm p-6 rounded-2xl shadow-lg border hover:shadow-xl transition-shadow duration-300`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Forecasted Trends</h3>
-                  <span className="text-sm text-gray-600">{sector} - {district}</span>
+                  <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Forecasted Trends</h3>
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{sector} - {district}</span>
                 </div>
                 <ExportButton targetId="trend-chart" filename={`trends-${district}-${sector}`} />
               </div>
@@ -148,12 +150,12 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+              className={`${theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-100'} backdrop-blur-sm p-6 rounded-2xl shadow-lg border hover:shadow-xl transition-shadow duration-300`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Top 3 Drivers</h3>
-                  <span className="text-sm text-gray-600">{sector}</span>
+                  <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Top 3 Drivers</h3>
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{sector}</span>
                 </div>
                 <ExportButton targetId="driver-chart" filename={`drivers-${sector}`} />
               </div>
@@ -167,9 +169,9 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+              className={`${theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-100'} backdrop-blur-sm p-6 rounded-2xl shadow-lg border hover:shadow-xl transition-shadow duration-300`}
             >
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">District-Level Visualization</h3>
+              <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>District-Level Visualization</h3>
               <Map />
             </motion.div>
 
@@ -178,23 +180,23 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-blue-50/80 backdrop-blur-sm p-6 rounded-2xl border border-blue-100"
+              className={`${theme === 'dark' ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50/80 border-blue-100'} backdrop-blur-sm p-6 rounded-2xl border`}
             >
-              <h3 className="text-sm font-semibold mb-3 text-gray-900">Data Sources</h3>
-              <div className="space-y-2 text-sm text-gray-600">
+              <h3 className={`text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Data Sources</h3>
+              <div className={`space-y-2 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 <p>
-                  • <a href="https://data.gov.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Open Government Data (OGD) Platform India</a>
+                  • <a href="https://data.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-blue-400 hover:underline' : 'text-blue-600 hover:underline'}>Open Government Data (OGD) Platform India</a>
                 </p>
                 <p>
-                  • <a href="https://www.census2011.co.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Census of India 2011</a>
+                  • <a href="https://www.census2011.co.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-blue-400 hover:underline' : 'text-blue-600 hover:underline'}>Census of India 2011</a>
                 </p>
                 <p>
-                  • <a href="https://niti.gov.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">NITI Aayog - National Institution for Transforming India</a>
+                  • <a href="https://niti.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-blue-400 hover:underline' : 'text-blue-600 hover:underline'}>NITI Aayog - National Institution for Transforming India</a>
                 </p>
                 <p>
-                  • <a href="https://www.mospi.gov.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Ministry of Statistics and Programme Implementation</a>
+                  • <a href="https://www.mospi.gov.in" target="_blank" rel="noopener noreferrer" className={theme === 'dark' ? 'text-blue-400 hover:underline' : 'text-blue-600 hover:underline'}>Ministry of Statistics and Programme Implementation</a>
                 </p>
-                <p className="text-xs text-gray-500 mt-3">
+                <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mt-3`}>
                   Note: Currently using mock data for demonstration. Real data integration in progress.
                 </p>
               </div>

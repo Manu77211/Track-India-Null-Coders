@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import LoadingBar from '@/components/LoadingBar'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,11 +18,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <LoadingBar />
-        <Navbar />
-        {children}
+    <html lang="en" className="overflow-x-hidden scroll-smooth" suppressHydrationWarning>
+      <body className={`${inter.className} overflow-x-hidden`} suppressHydrationWarning>
+        <ThemeProvider>
+          <LoadingBar />
+          <Navbar />
+          <div className="relative">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )
