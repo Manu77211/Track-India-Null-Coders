@@ -1,14 +1,21 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Send } from 'lucide-react'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { Send, Plus, Menu, X, Trash2, MessageSquare, Sparkles } from 'lucide-react'
 import ChatMessage from './ChatMessage'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface Message {
   id: number
   role: 'user' | 'assistant'
   content: string
-  chart?: any
+}
+
+interface Conversation {
+  id: string
+  title: string
+  messages: Message[]
+  timestamp: Date
 }
 
 const mockResponses = [
@@ -23,17 +30,32 @@ const mockResponses = [
   },
 ]
 
+const examplePrompts = [
+  "What is the literacy rate in Bangalore?",
+  "Show health data for Maharashtra",
+  "Compare water availability across states",
+  "Forecast education trends for 2025-2030"
+]
+
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([
+  const { theme } = useTheme()
+  const [conversations, setConversations] = useState<Conversation[]>([
     {
-      id: 0,
-      role: 'assistant',
-      content: "Hello! I'm your AI assistant for India's development data. Ask me anything about education, health, or water sectors across Indian districts.",
-    },
+      id: '1',
+      title: 'New Chat',
+      messages: [],
+      timestamp: new Date(),
+    }
   ])
+  const [currentConversationId, setCurrentConversationId] = useState('1')
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const currentConversation = conversations.find(c => c.id === currentConversationId)
+  const messages = useMemo(() => currentConversation?.messages || [], [currentConversation])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -42,6 +64,13 @@ export default function ChatInterface() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px'
+    }
+  }, [input])
 
   const handleSend = () => {
     if (!input.trim()) return
@@ -52,7 +81,19 @@ export default function ChatInterface() {
       content: input,
     }
 
-    setMessages([...messages, userMessage])
+    // Update conversation with user message
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === currentConversationId) {
+        const updatedMessages = [...conv.messages, userMessage]
+        return {
+          ...conv,
+          messages: updatedMessages,
+          title: conv.messages.length === 0 ? input.slice(0, 30) + '...' : conv.title
+        }
+      }
+      return conv
+    }))
+
     setInput('')
     setIsTyping(true)
 
@@ -64,7 +105,16 @@ export default function ChatInterface() {
         role: 'assistant',
         content: randomResponse.content,
       }
-      setMessages((prev) => [...prev, aiMessage])
+      
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === currentConversationId) {
+          return {
+            ...conv,
+            messages: [...conv.messages, aiMessage]
+          }
+        }
+        return conv
+      }))
       setIsTyping(false)
     }, 1500)
   }
@@ -76,48 +126,209 @@ export default function ChatInterface() {
     }
   }
 
+  const createNewChat = () => {
+    const newConv: Conversation = {
+      id: Date.now().toString(),
+      title: 'New Chat',
+      messages: [],
+      timestamp: new Date()
+    }
+    setConversations(prev => [newConv, ...prev])
+    setCurrentConversationId(newConv.id)
+  }
+
+  const deleteConversation = (id: string) => {
+    if (conversations.length === 1) return
+    setConversations(prev => prev.filter(c => c.id !== id))
+    if (currentConversationId === id) {
+      setCurrentConversationId(conversations.find(c => c.id !== id)?.id || '')
+    }
+  }
+
+  const handleExampleClick = (prompt: string) => {
+    setInput(prompt)
+    textareaRef.current?.focus()
+  }
+
   return (
-    <div className="flex flex-col h-[calc(100vh-16rem)] max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100">
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-        {messages.map((message) => (
-          <ChatMessage key={message.id} message={message} />
-        ))}
-        {isTyping && (
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm">
-              AI
+    <div className={`flex h-[calc(100vh-64px)] ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
+      {/* Sidebar */}
+      <div
+        className={`${
+          sidebarOpen ? 'w-64' : 'w-0'
+        } ${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'} border-r transition-all duration-300 flex flex-col overflow-hidden`}
+      >
+        {/* New Chat Button */}
+        <div className="p-3">
+          <button
+            onClick={createNewChat}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${
+              theme === 'dark' 
+                ? 'bg-gray-800 hover:bg-gray-750 border border-gray-700' 
+                : 'bg-white hover:bg-gray-100 border border-gray-300'
+            } transition-colors`}
+          >
+            <Plus size={18} />
+            <span className="font-medium">New Chat</span>
+          </button>
+        </div>
+
+        {/* Conversations List */}
+        <div className="flex-1 overflow-y-auto px-3 space-y-2">
+          {conversations.map((conv) => (
+            <div
+              key={conv.id}
+              onClick={() => setCurrentConversationId(conv.id)}
+              className={`group relative flex items-center gap-2 px-3 py-3 rounded-lg cursor-pointer transition-all ${
+                currentConversationId === conv.id
+                  ? theme === 'dark'
+                    ? 'bg-gray-800'
+                    : 'bg-gray-200'
+                  : theme === 'dark'
+                  ? 'hover:bg-gray-800'
+                  : 'hover:bg-gray-200'
+              }`}
+            >
+              <MessageSquare size={16} className="flex-shrink-0" />
+              <span className="flex-1 text-sm truncate">{conv.title}</span>
+              {conversations.length > 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    deleteConversation(conv.id)
+                  }}
+                  className={`opacity-0 group-hover:opacity-100 p-1 rounded ${
+                    theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-300'
+                  } transition-opacity`}
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
             </div>
-            <div className="bg-gray-100 rounded-lg p-3">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100" />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200" />
-              </div>
-            </div>
+          ))}
+        </div>
+
+        {/* Sidebar Footer */}
+        <div className={`p-4 border-t ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
+          <div className="flex items-center gap-2 text-xs">
+            <Sparkles size={14} className="text-blue-500" />
+            <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Track India AI
+            </span>
           </div>
-        )}
-        <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-gray-200 p-4 bg-white/50 backdrop-blur-sm rounded-b-2xl">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask about India's development data..."
-            className="flex-1 p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-          />
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className={`flex items-center gap-3 px-4 py-3 border-b ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
           <button
-            onClick={handleSend}
-            disabled={!input.trim()}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className={`p-2 rounded-lg ${
+              theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
+            } transition-colors`}
           >
-            <Send size={20} />
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
+          <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            Chat with India
+          </h1>
+        </div>
+
+        {/* Messages Container */}
+        <div className="flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center p-8">
+              <div className="max-w-3xl w-full space-y-8">
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-r from-blue-600 to-green-600 rounded-2xl flex items-center justify-center">
+                    <MessageSquare size={32} className="text-white" />
+                  </div>
+                  <h2 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    How can I help you today?
+                  </h2>
+                  <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Ask me about education, health, and water sectors across Indian districts
+                  </p>
+                </div>
+
+                {/* Example Prompts */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {examplePrompts.map((prompt, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleExampleClick(prompt)}
+                      className={`p-4 rounded-xl text-left transition-all ${
+                        theme === 'dark'
+                          ? 'bg-gray-900 hover:bg-gray-800 border border-gray-800'
+                          : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <MessageSquare size={18} className="text-blue-500 flex-shrink-0 mt-1" />
+                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {prompt}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+              {messages.map((message) => (
+                <ChatMessage key={message.id} message={message} />
+              ))}
+              {isTyping && (
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm bg-gradient-to-r from-blue-600 to-green-600`}>
+                    AI
+                  </div>
+                  <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'} rounded-2xl px-4 py-3`}>
+                    <div className="flex gap-1">
+                      <div className={`w-2 h-2 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-500'} rounded-full animate-bounce`} />
+                      <div className={`w-2 h-2 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-500'} rounded-full animate-bounce`} style={{ animationDelay: '0.1s' }} />
+                      <div className={`w-2 h-2 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-500'} rounded-full animate-bounce`} style={{ animationDelay: '0.2s' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input Area */}
+        <div className={`border-t ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'} p-4`}>
+          <div className="max-w-3xl mx-auto">
+            <div className={`flex gap-3 items-end p-2 rounded-2xl ${
+              theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-gray-50 border border-gray-200'
+            }`}>
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Message Track India AI..."
+                rows={1}
+                className={`flex-1 bg-transparent border-none outline-none resize-none px-2 py-2 max-h-32 ${
+                  theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'
+                }`}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim()}
+                className="bg-gradient-to-r from-blue-600 to-green-600 text-white p-2.5 rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex-shrink-0"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+            <p className={`text-xs text-center mt-2 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+              Track India AI can make mistakes. Check important info.
+            </p>
+          </div>
         </div>
       </div>
     </div>
